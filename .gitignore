@@ -1,0 +1,10 @@
+# Environments
+venv/
+.env
+
+# System files
+.DS_Store
+
+# Data (Crucial for large PDF sets)
+reports/raw/
+reports/output/
