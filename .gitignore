@@ -5,6 +5,6 @@ venv/
 # System files
 .DS_Store
 
-# Data (Crucial for large PDF sets)
+# Data
 reports/raw/
 reports/output/
