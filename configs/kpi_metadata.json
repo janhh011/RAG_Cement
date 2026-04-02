@@ -1,0 +1,53 @@
+{
+  "KPIs": {
+    "kpi_1": {
+      "number": 1,
+      "name": "Alternative fuel rate (kiln fuels)",
+      "search_string": "Alternative fuel rate (kiln fuels) %",
+      "definition": "The energy contained in consumed alternative fuels divided by the total heat consumption from all kiln fuels used in manufacturing the clinker produced during the year.",
+      "unit": "%",
+      "explanation": "Alternative fuels (AF): Fuel derived from non-primary materials that can be further divided into biomass, fossil and mixed (fossil and biomass) alternative fuels."
+    },
+    "kpi_2": {
+      "number": 2,
+      "name": "Biomass fuel rate (kiln fuels)",
+      "search_string": "Biomass fuel rate (kiln fuels) %",
+      "definition": "The energy contained in consumed biomass fuels and the biomass content of mixed fossil and biomass fuels divided by the total heat consumption from all kiln fuels used in manufacturing the clinker produced during the year.",
+      "unit": "%"
+    },
+    "kpi_3": {
+      "number": 3,
+      "name": "Specific heat consumption for clinker production",
+      "search_string": "Specific heat consumption for clinker production MJ/tonne",
+      "definition": "The total energy contained in all fuels consumed divided by the tonnes of clinker produced during the year.",
+      "unit": "MJ/tonne"
+    },
+    "kpi_4": {
+      "number": 4,
+      "name": "Alternative Raw Materials rate (% ARM)",
+      "search_string": "Proportion of alternative raw materials - Clinker production - Cement production %",
+      "definition": "Consumption of alternative raw materials in clinker and cement as a percentage of total raw material used in manufacturing the clinker produced (calculated on a dry basis).",
+      "unit": "%",
+      "explanation": "Alternative raw material (ARM): Raw materials derived from rion-primary materials (waste, secondary materials, by-products or co-products).",
+      "calculation_logic": "% ARM = (% alternative raw materials in clinker produced x clinker/cement (eq)) + (% alternative raw materials in cement produced x (1-clinker/cement (eq))",
+      "example": "The calculation is made on a company basis for the clinker and cement production stages using data for the reporting year. The company shall record the amount (in tonnes) and average moisture content of each primary raw material and alternative raw material consumed in clinker and cement production. % alternative raw materials consumed in clinker produced (dry) = (71439/2271284) x 100 = 3.15%. % alternative raw materials consumed in cement produced (dry) = (747750/903950) x 100 = 82.72%. % ARM = (3.15 x 0.70) + (82.73 x (1-0.70)) = 27.0%"
+    },
+    "kpi_5": {
+      "number": 5,
+      "name": "Clinker/cement (equivalent) factor",
+      "search_string": "Clinker content % Clinker/cement (equivalent) factor",
+      "definition": "The clinker/cement (equivalent) factor calculated based on the total clinker consumption and cement produced.",
+      "unit": "%"
+    }
+  },
+  "glossary": {
+    "By-product": "A substance or object resulting from a production process where the primary aim of the production process is not to produce that item (i.e. a production residue).",
+    "Cement": "Building material made by grinding clinker together with various mineral components such as gypsum, limestone, blast furnace slag, coal fly ash and natural volcanic material; includes special cements such as the ones based on calcium aluminates.",
+    "Circular economy": "A new economic model that is regenerative by design. The goal is to retain the value of the circulating resources, products, parts and materials by creating a system with innovative business models that allow for long life, optimal (re)use, renewability, refurbishment, remanufacturing and recycling.",
+    "Clinker": "Intermediate product in cement manufacturing and the main substance in cement; clinker is the result of calcination of limestone in the kiln and subsequent reactions caused through burning.",
+    "Co-processing": "The use of alternative fuels and raw materials in manufacturing processes for the purpose of energy recovery and/or material recycling and resultant reduction in the use of primary fuels and/or raw materials through substitution.",
+    "Secondary material": "Material recovered from previous use or from waste which substitutes primary materials.",
+    "Waste": "Any substance or object which the holder intends to discard or is required to discard.",
+    "Waste hierarchy": "A tool used in the evaluation of processes that protect the environment alongside resource and energy from the most favourable to the least favourable actions."
+  }
+}
