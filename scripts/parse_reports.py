@@ -1,3 +1,4 @@
+import json
 import os
 from pathlib import Path
 from docling.document_converter import DocumentConverter
@@ -21,7 +22,7 @@ def main():
     print(f"File list: {pdf_files}")
 
     for pdf_path in pdf_files:
-        output_path = output_dir/f"{pdf_path.stem}.md"
+        output_path = output_dir/f"{pdf_path.stem}.json"
         if output_path.exists():
             print(f"Skipping {pdf_path.name} (already converted)")
             continue
@@ -31,7 +32,7 @@ def main():
             result = converter.convert(pdf_path)
 
             with output_path.open("w", encoding="utf-8") as f:
-                f.write(result.document.export_to_markdown())
+                json.dump(result.document.export_to_dict(), f)
                 
             print(f"Success: Saved to {output_path.name}")
 
