@@ -9,8 +9,9 @@ from transformers import AutoTokenizer
 #1.Path definition, 2.Select correct tokenizer for specific model, 3.Configure Hybridchunker, 4. Process data with chunker 
 #To Do: select model and define model_id + max_tokens
 
-EMBED_MODEL_ID = "xyz"
-MAX_TOKENS = 0
+EMBED_MODEL_ID = "Qwen/Qwen3-Embedding-8B"
+MAX_MODEL_TOKENS = 32768
+MAX_CHUNKING_TOKENS = 512 #model max tokens is 32768, but lowering for meaningful vectors
 
 def main():
     #(1)
@@ -21,16 +22,17 @@ def main():
     #(2)
     try:
         hf_tokenizer = AutoTokenizer.from_pretrained(EMBED_MODEL_ID)
-        tokenizer = HuggingFaceTokenizer(tokenizer = hf_tokenizer, max_tokens = MAX_TOKENS)
+        tokenizer = HuggingFaceTokenizer(tokenizer=hf_tokenizer, max_tokens = MAX_MODEL_TOKENS)
     except Exception as e:
         print(f"Error loading tokenizer: {e}")
-
+        return
+    
     #(3)
     #merge_peers=True combines small sections to maximize LLM context
     #repeat_table_header=True makes sure table column names are appended to split rows
     chunker = HybridChunker(
         tokenizer=tokenizer,
-        max_tokens = MAX_TOKENS,
+        max_tokens = MAX_CHUNKING_TOKENS,
         merge_peers=True,
         repeat_table_header = True
     )
@@ -43,8 +45,9 @@ def main():
     for json_path in json_files:
         print(f"Processing {json_path.name}")
 
-        if f"{json_path.stem}.json".exists():
-            print(f"Target file {json_path.stem} already exists. Skipping...")
+        output_path = output_dir / f"{json_path.stem}_chunks.json"
+        if output_path.exists():
+            print(f"Skipping {json_path.name} (already chunked)")
             continue
 
         try:
@@ -56,17 +59,31 @@ def main():
             for i, chunk in enumerate(chunk_iter):
                 text_for_llm = chunker.contextualize(chunk)
 
+                page_set = set()
+                for item in chunk.meta.doc_items:
+                    for prov in item.prov:
+                        if hasattr(prov, "page_no"):
+                            page_set.add(prov.page_no)
+
                 processed_chunks.append({
                     "id": f"{json_path.stem}_{i}",
                     "text": text_for_llm,
                     "metadata": {
                         "source": json_path.name,
                         "headings": chunk.meta.export_json_dict().get("headings", []),
-                        "page_numbers": [prov.page_no for prov in chunk.meta.doc_items if hasattr(prov, 'page_no')]
+                        "page_numbers": sorted(list(page_set))
                     }
                 })
 
-                print(f"Success. Created {len(processed_chunks)} chunks for {json_path.stem}.")
+
+            with output_path.open("w", encoding="utf-8") as f:
+                json.dump(processed_chunks, f, indent=2)
+                
+            print(f"Success: Created {len(processed_chunks)} chunks for {json_path.stem}")
 
         except Exception as e:
-            print(f"Error {e}")
+            print(f"Error processing {json_path.name}: {e}")
+
+
+if __name__ == "__main__":
+    main()
