@@ -1,13 +1,15 @@
 import json
-import os
 from pathlib import Path
 from docling.document_converter import DocumentConverter
 
-#This is a test run for the Docling converter. It looks for sustainability reports in reports/raw , converts with Docling, and then pasts the results into reports/output.
+#This script looks for sustainability reports in data/raw , converts with Docling into a JSON format to be later converted into DoclingDocument, and then pasts the results into data/output.
+#1.Path definition, 2.Iterate reports and convert with Docling (skip if target JSON/Markdown already exists)
 
 def main():
+    #(1)
     input_dir = Path("data/raw")
     output_dir = Path("data/processed")
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     print("Initializing Docling...")
     converter = DocumentConverter()
@@ -21,6 +23,7 @@ def main():
     print(f"Found {len(pdf_files)} reports. Starting conversion...")
     print(f"File list: {pdf_files}")
 
+    #(2)
     for pdf_path in pdf_files:
         output_path = output_dir/f"{pdf_path.stem}.json"
         if output_path.exists():

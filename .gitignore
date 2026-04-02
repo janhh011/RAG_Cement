@@ -6,5 +6,6 @@ venv/
 .DS_Store
 
 # Data
-reports/raw/
-reports/output/
+data/raw/
+data/processed/
+data/Reports_not_for_testing
