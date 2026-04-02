@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from docling.document_converter import DoclingDocument
+from docling_core.types.doc import DoclingDocument
 from docling.chunking import HybridChunker
 from docling_core.transforms.chunker.tokenizer.huggingface import HuggingFaceTokenizer
 from transformers import AutoTokenizer
@@ -48,10 +48,25 @@ def main():
             continue
 
         try:
-            with json_path.open("r", encoding="utf-8") as f:
-                doc_dict = json.load(f)
+            doc = DoclingDocument.load_from_json(json_path)
             
+            chunk_iter = chunker.chunk(doc)
+            processed_chunks = []
             
+            for i, chunk in enumerate(chunk_iter):
+                text_for_llm = chunker.contextualize(chunk)
+
+                processed_chunks.append({
+                    "id": f"{json_path.stem}_{i}",
+                    "text": text_for_llm,
+                    "metadata": {
+                        "source": json_path.name,
+                        "headings": chunk.meta.export_json_dict().get("headings", []),
+                        "page_numbers": [prov.page_no for prov in chunk.meta.doc_items if hasattr(prov, 'page_no')]
+                    }
+                })
+
+                print(f"Success. Created {len(processed_chunks)} chunks for {json_path.stem}.")
 
         except Exception as e:
             print(f"Error {e}")
