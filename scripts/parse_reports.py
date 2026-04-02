@@ -5,8 +5,8 @@ from docling.document_converter import DocumentConverter
 #This is a test run for the Docling converter. It looks for sustainability reports in reports/raw , converts with Docling, and then pasts the results into reports/output.
 
 def main():
-    input_dir = Path("reports/raw")
-    output_dir = Path("reports/output")
+    input_dir = Path("data/raw")
+    output_dir = Path("data/processed")
 
     print("Initializing Docling...")
     converter = DocumentConverter()
