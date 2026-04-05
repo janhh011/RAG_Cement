@@ -1,12 +1,14 @@
 import json
 from pathlib import Path
 import chromadb
-from chromadb.utils.embedding_functions import HuggingFaceEmbeddingFunction
+
+#fix this: (look for ollamaembeddingfunction)
+from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
 import ollama
-from pydantic import Basemodel
+from pydantic import BaseModel
 
 #Define the schema for the reponse
-class KpiBasic(Basemodel):
+class KpiBasic(BaseModel):
     value: float | None = None
     unit: str
     page_reference: str|None = None
@@ -19,7 +21,7 @@ RESULTS_DIR = Path("data/results")
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 EMBED_MODEL_ID = "Qwen/Qwen3-Embedding-8B"
-LLM_MODEL = "xyz"
+LLM_MODEL = "qwen2.5:14b"
 
 def call_ollama_extraction(prompt):
     """
@@ -29,10 +31,10 @@ def call_ollama_extraction(prompt):
         reponse = ollama.chat(
             model = LLM_MODEL,
             messages=[{"role":"user", "content":prompt}],
-            format = "json",
+            format=KpiBasic.model_json_schema(),
             options = {"temperature" : 0}
         )
-        return KpiBasic.model_validate_json(reponse.message.content)
+        return KpiBasic.model_validate_json(reponse["message"]["content"])
     except Exception as e:
         print(f"Error: {e}")
         return None
@@ -40,7 +42,9 @@ def call_ollama_extraction(prompt):
 
 def main():
     #Since the vector database is PDF specific, vector storage is ephemeral (in-memory vector database)
-    embedding_function = HuggingFaceEmbeddingFunction(model_name=EMBED_MODEL_ID)
+
+    #fix this:
+    embedding_function = SentenceTransformerEmbeddingFunction(model_name=EMBED_MODEL_ID)
     vector_storage = chromadb.EphemeralClient()
 
     if not METADATA_PATH.exists():
@@ -48,7 +52,7 @@ def main():
         return
     
     #load metadata json document
-    with METADATA_PATH.open("f", encoding="utf-8") as f:
+    with METADATA_PATH.open("r", encoding="utf-8") as f:
         metadata = json.load(f)
 
     #list all chunks (never between two companies)
@@ -100,7 +104,7 @@ def main():
             context_text ="\n---\n".join(query_results["documents"][0])
 
             prompt=f""" 
-            Extract the following KPI from the sustainability report context provided below.
+            Strictly extract the following KPI using ONLY the provided sustainability report context. You are prohibited from using external knowledge, prior training data, or making any inferences not explicitly stated in the text. If the information is missing from the context, leave the field empty rather than providing data from outside sources.
             
             KPI Target: {kpi_info['name']}
             Technical Definition: {kpi_info['definition']}
@@ -123,7 +127,9 @@ def main():
         with output_path.open("w", encoding="utf-8") as f:
             json.dump(extraction_results, f, indent=2)
 
-        print("Success. Data exported to {output_path}")
+        print(f"Success. Data exported to {output_path}")
+
+        vector_storage.delete_collection(name=collection_name)
 
 
 if __name__ == "__main__":
