@@ -2,8 +2,7 @@ import json
 from pathlib import Path
 import chromadb
 
-#fix this: (look for ollamaembeddingfunction)
-from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
+from chromadb.utils.embedding_functions import OllamaEmbeddingFunction
 import ollama
 from pydantic import BaseModel
 
@@ -20,7 +19,7 @@ CHUNKS_DIR = Path("data/chunks")
 RESULTS_DIR = Path("data/results")
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
-EMBED_MODEL_ID = "Qwen/Qwen3-Embedding-8B"
+EMBED_MODEL_ID = "qwen3-embedding:8b"
 LLM_MODEL = "qwen2.5:14b"
 
 def call_ollama_extraction(prompt):
@@ -44,7 +43,10 @@ def main():
     #Since the vector database is PDF specific, vector storage is ephemeral (in-memory vector database)
 
     #fix this:
-    embedding_function = SentenceTransformerEmbeddingFunction(model_name=EMBED_MODEL_ID)
+    embedding_function = OllamaEmbeddingFunction(
+        model_name=EMBED_MODEL_ID,
+        url="http://localhost:11434/api/embeddings"
+    )
     vector_storage = chromadb.EphemeralClient()
 
     if not METADATA_PATH.exists():
