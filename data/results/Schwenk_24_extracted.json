@@ -1,0 +1,32 @@
+{
+  "kpi_1": {
+    "value": 435.0,
+    "unit": "ton cement equivalent",
+    "page_reference": null,
+    "quote": "Specific net CO 2 emissions (per ton cement equivalent), Germany, 2019: "
+  },
+  "kpi_2": {
+    "value": null,
+    "unit": "mg/m\u00b3",
+    "page_reference": "SCHWENK Building Materials Group",
+    "quote": "Limit value ammonia (NH3) emissions in mg/m\u00b3"
+  },
+  "kpi_3": {
+    "value": 40.0,
+    "unit": "tons",
+    "page_reference": null,
+    "quote": "In cement production in Latvia for example, we currently conduct around 40 different tests on a regular basis - for processes, fuels, and cement."
+  },
+  "kpi_4": {
+    "value": null,
+    "unit": "SCHWENK",
+    "page_reference": "Because natural deposits are finite and also for ecological reasons, alternative raw materials and ash from alternative fuels are becoming increasingly important. At SCHWENK we have replaced more than 10% of natural raw materials with alternative materials. They are combined with the natural raw materials in such a way that we can maintain the high quality of our products. The addition of alternative raw materials not only saves natural raw materials and closes material cycles, it also reduces CO 2 emissions.",
+    "quote": "The manufacture of cement and concrete requires high volumes of natural raw materials. They are obtained by excavating the primary material required from quarries or sand and gravel pits. These materials are the main basis for the production of cement and concrete."
+  },
+  "kpi_5": {
+    "value": 220000.0,
+    "unit": "t CO\u2082 per year",
+    "page_reference": "Goal 1",
+    "quote": "Reduce the average CO\u2082 emission factor of the clinker production till 2025 for saving approximately 220 000 t CO\u2082 annually."
+  }
+}
