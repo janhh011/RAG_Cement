@@ -6,11 +6,11 @@ from chromadb.utils.embedding_functions import OllamaEmbeddingFunction
 import ollama
 from pydantic import BaseModel
 
-#Define the schema for the reponse
+#Define the schema for the response
 class KpiBasic(BaseModel):
     value: float | None = None
     unit: str
-    page_reference: str|None = None
+    page_reference: int
     quote: str
 
 #Path definitions and model selection
@@ -21,19 +21,21 @@ RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 EMBED_MODEL_ID = "qwen3-embedding:8b"
 LLM_MODEL = "qwen2.5:14b"
+BATCH_SIZE = 5
+N_RESULTS = 10
 
 def call_ollama_extraction(prompt):
     """
     Via Ollama, this function queries the LLM based on the prompt given in the parameter that was passed
     """
     try:
-        reponse = ollama.chat(
+        response = ollama.chat(
             model = LLM_MODEL,
             messages=[{"role":"user", "content":prompt}],
             format=KpiBasic.model_json_schema(),
             options = {"temperature" : 0}
         )
-        return KpiBasic.model_validate_json(reponse["message"]["content"])
+        return KpiBasic.model_validate_json(response["message"]["content"])
     except Exception as e:
         print(f"Error: {e}")
         return None
@@ -86,11 +88,15 @@ def main():
         )
         """
 
-        collection.add(
-            ids=[c["id"]for c in report_chunks],
-            documents=[c["text"]for c in report_chunks],
-            metadatas=[c["metadata"]for c in report_chunks]
-        )
+        for i in range(0, len(report_chunks), BATCH_SIZE):
+            batch = report_chunks[i : i + BATCH_SIZE]
+            
+            collection.add(
+                ids=[c["id"] for c in batch],
+                documents=[c["text"] for c in batch],
+                metadatas=[c["metadata"] for c in batch]
+            )
+            print(f"Embedded batch {i//BATCH_SIZE + 1}/{(len(report_chunks)-1)//BATCH_SIZE + 1}")
 
         extraction_results = {}
 
@@ -100,23 +106,25 @@ def main():
 
             query_results=collection.query(
                 query_texts=[kpi_info["search_string"]],
-                n_results=10
+                n_results=N_RESULTS
             )
 
+            print(f"{kpi_info}'s relevant chunks: {query_results}")
             context_text ="\n---\n".join(query_results["documents"][0])
 
             prompt=f""" 
-            Strictly extract the following KPI using ONLY the provided sustainability report context. You are prohibited from using external knowledge, prior training data, or making any inferences not explicitly stated in the text. If the information is missing from the context, leave the field empty rather than providing data from outside sources.
-            
-            KPI Target: {kpi_info['name']}
-            Technical Definition: {kpi_info['definition']}
-            Target Unit: {kpi_info['unit']}
-            Calculation Logic: {kpi_info.get('calculation_logic', 'Direct extraction')}
-            
-            Glossary Reference:
-            {json.dumps(metadata.get('glossary', {}), indent=2)}
+            You are a strict ESG auditor. Your task is to find the EXACT value for {kpi_info['name']}. The KPI has to be company-wide, not regional or project-based.
 
-            Sustainability Report Context:
+            ### STRICTURES:
+            1. UNIT MATCH: The value MUST correspond to the unit '{kpi_info['unit']}'. If the context discusses {kpi_info['name']} but in a different unit (e.g., tonnes instead of %), you MUST return null.
+            2. SEMANTIC MATCH: Do not confuse $CO_2$ emissions, test counts, or production volumes with the specific KPI.
+            3. ADMIT DEFEAT: If the exact KPI is not present, return 'value': null. Do not guess.
+
+            ### KPI LOGIC:
+            Definition: {kpi_info['definition']}
+            {f"Calculation Logic: {kpi_info['calculation_logic']}" if 'calculation_logic' in kpi_info else ""}
+
+            ### CONTEXT:
             {context_text}
             """
 
