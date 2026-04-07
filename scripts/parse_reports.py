@@ -10,7 +10,6 @@ from pypdf import PdfReader, PdfWriter #splitting pdf for better memory usage
 #This script looks for sustainability reports in data/raw , converts with Docling into a JSON format to be later converted into DoclingDocument, and then pasts the results into data/output.
 #1.Path definition, 2.Iterate reports and convert with Docling (skip if target JSON/Markdown already exists)
 
-
 def main():
     #(1)
     input_dir = Path("data/raw")
