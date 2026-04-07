@@ -11,7 +11,7 @@ from transformers import AutoTokenizer
 
 EMBED_MODEL_ID = "Qwen/Qwen3-Embedding-8B"
 MAX_MODEL_TOKENS = 32768
-MAX_CHUNKING_TOKENS = 512 #model max tokens is 32768, but lowering for meaningful vectors
+MAX_CHUNKING_TOKENS = 400 #model max tokens is 32768, but lowering for meaningful vectors
 
 def main():
     #(1)
