@@ -11,7 +11,7 @@ from transformers import AutoTokenizer
 
 EMBED_MODEL_ID = "Qwen/Qwen3-Embedding-8B"
 MAX_MODEL_TOKENS = 32768
-MAX_CHUNKING_TOKENS = 400 #model max tokens is 32768, but lowering for meaningful vectors
+MAX_CHUNKING_TOKENS = 1024 #model max tokens is 32768, but lowering for meaningful vectors
 
 def main():
     #(1)
@@ -59,11 +59,7 @@ def main():
             for i, chunk in enumerate(chunk_iter):
                 text_for_llm = chunker.contextualize(chunk)
 
-                page_set = set()
-                for item in chunk.meta.doc_items:
-                    for prov in item.prov:
-                        if hasattr(prov, "page_no"):
-                            page_set.add(prov.page_no)
+                page_set = {prov.page_no for item in chunk.meta.doc_items for prov in item.prov if hasattr(prov, "page_no")}
 
                 processed_chunks.append({
                     "id": f"{json_path.stem}_{i}",
