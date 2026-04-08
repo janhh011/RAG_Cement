@@ -49,73 +49,43 @@ def main():
         format_options={InputFormat.PDF: PdfFormatOption(pipeline_options = pipeline_options)}
         )
 
-    pdf_files = list(input_dir.glob("*.pdf"))
+    pdf_files = [
+        f for f in input_dir.glob("*.pdf") 
+        if not (output_dir / f"{f.stem}.json").exists()
+    ]
 
     if not pdf_files:
-        print(f"No PDFs found in {input_dir}. Please add reports.")
-        return False
+        print(f"No new PDFs found for processing.")
+        return
 
     print(f"Found {len(pdf_files)} reports. Starting conversion...")
     print(f"File list: {pdf_files}")
 
     #(2)
-    for pdf_path in pdf_files:
-        output_path = output_dir/f"{pdf_path.stem}.json"
-        if output_path.exists():
-            print(f"Skipping {pdf_path.name} (already converted)")
+    conv_results = converter.convert_all(pdf_files)
+
+    for result in conv_results:
+        source_name = result.input.file.name
+        
+        if result.document is None:
+            print(f"Failed to convert: {source_name}")
             continue
+
         try:
-            print(f"Converting: {pdf_path.stem}...")
+            # Export JSON
+            json_output = output_dir / f"{Path(source_name).stem}.json"
+            with json_output.open("w", encoding="utf-8") as f:
+                json.dump(result.document.export_to_dict(), f)
 
-            #Batching the PDF
-            reader = PdfReader(pdf_path)
-            total_pages = len(reader.pages)
-            docs_to_merge = []
+            # Export Markdown (Optimized for LLM context)
+            md_output = output_dir / f"{Path(source_name).stem}.md"
+            with md_output.open("w", encoding="utf-8") as f:
+                f.write(result.document.export_to_markdown())
 
-            for start_page in range(0, total_pages, BATCH_SIZE):
-                end_page = min(start_page + BATCH_SIZE, total_pages)
-                print(f"Converting pages {start_page +1} to {end_page}...")
-
-                writer = PdfWriter()
-                for page_idx in range(start_page, end_page):
-                    writer.add_page(reader.pages[page_idx])
-
-                batch_tmp = temp_dir / f"temp_p{start_page}.pdf"
-                with open(batch_tmp, "wb") as f:
-                    writer.write(f)
-
-                #Convert partial PDF
-                result = converter.convert(batch_tmp)
-
-                # Merge into master document
-                docs_to_merge.append(result.document)
-                
-                # Cleanup batch
-                batch_tmp.unlink()
-                del result
-                gc.collect()
-
-            #save full document
-            if docs_to_merge:
-                print("Merging all pages into final document...")
-                full_doc = DoclingDocument.concatenate(docs=docs_to_merge)
-
-                with output_path.open("w", encoding="utf-8") as f:
-                    json.dump(full_doc.export_to_dict(), f)
-
-                md_output_path = output_dir / f"{pdf_path.stem}.md"
-                with md_output_path.open("w", encoding="utf-8") as f:
-                    f.write(full_doc.export_to_markdown())
-                
-                print(f"Success: {output_path.name} and {md_output_path.name}")
+            print(f"Successfully processed: {source_name}")
 
         except Exception as e:
-            print(f"Failed to process {pdf_path.name}: {e}")
-        finally:
-            # Clear master doc from memory for next file
-            docs_to_merge = []
-            gc.collect()
-
+            print(f"Error saving {source_name}: {e}")
 
 if __name__ == "__main__":
     main()
