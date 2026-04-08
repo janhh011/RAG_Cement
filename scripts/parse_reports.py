@@ -16,9 +16,7 @@ def main():
     #(1)
     input_dir = Path("data/raw")
     output_dir = Path("data/processed")
-    temp_dir = Path("data/temp")
     output_dir.mkdir(parents=True, exist_ok=True)
-    temp_dir.mkdir(parents=True, exist_ok=True)
 
     #Change: PDFPipelineOptions() (specifically designed for procesisng PDFs and image-rich documents)
     pipeline_options = PdfPipelineOptions()
