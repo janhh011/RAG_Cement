@@ -102,7 +102,12 @@ def main():
 
                 with output_path.open("w", encoding="utf-8") as f:
                     json.dump(full_doc.export_to_dict(), f)
-                print(f"Success: {output_path.name}")
+
+                md_output_path = output_dir / f"{pdf_path.stem}.md"
+                with md_output_path.open("w", encoding="utf-8") as f:
+                    f.write(full_doc.export_to_markdown())
+                
+                print(f"Success: {output_path.name} and {md_output_path.name}")
 
         except Exception as e:
             print(f"Failed to process {pdf_path.name}: {e}")
