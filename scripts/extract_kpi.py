@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 #Define the schema for the response
 class KpiBasic(BaseModel):
-    value: float | None = None
+    value: str | float | None = None
     unit: str
     page_reference: int
     quote: str
@@ -109,22 +109,26 @@ def main():
                 n_results=N_RESULTS
             )
 
-            print(f"{kpi_info}'s relevant chunks: {query_results}")
-            context_text ="\n---\n".join(query_results["documents"][0])
+            context_segments = []
+            for doc, meta in zip(query_results["documents"][0], query_results["metadatas"][0]):
+                context_segments.append(f"--- SOURCE: Page {meta.get('page_numbers')} ---\n{doc}")
+            context_text = "\n\n".join(context_segments)
 
-            prompt=f""" 
-            You are a strict ESG auditor. Your task is to find the EXACT value for {kpi_info['name']}. The KPI has to be company-wide, not regional or project-based.
+            prompt = f""" 
+            You are a strict ESG auditor. Extract the EXACT value for {kpi_info['name']} from the following MARKDOWN context for the year 2024.
 
-            ### STRICTURES:
-            1. UNIT MATCH: The value MUST correspond to the unit '{kpi_info['unit']}'. If the context discusses {kpi_info['name']} but in a different unit (e.g., tonnes instead of %), you MUST return null.
-            2. SEMANTIC MATCH: Do not confuse $CO_2$ emissions, test counts, or production volumes with the specific KPI.
-            3. ADMIT DEFEAT: If the exact KPI is not present, return 'value': null. Do not guess.
+            ### AUDIT CONSTRAINTS:
+            1. MARKDOWN TABLE LOGIC: If the data is in a table, identify the correct column (Year/Category) and row (KPI Name).
+            2. UNIT RIGIDITY: The value MUST be in '{kpi_info['unit']}'. If the table lists {kpi_info['name']} in a different unit, return 'value': null.
+            3. HIERARCHY: Only extract company-wide/group-level data. Ignore regional or subsidiary-specific values.
+            4. ADMIT DEFEAT: If the exact KPI is missing or ambiguous in the context, return 'value': null.
 
-            ### KPI LOGIC:
-            Definition: {kpi_info['definition']}
-            {f"Calculation Logic: {kpi_info['calculation_logic']}" if 'calculation_logic' in kpi_info else ""}
+            ### KPI SPECIFICATION:
+            - Name: {kpi_info['name']}
+            - Definition: {kpi_info['definition']}
+            {f"- Logic: {kpi_info['calculation_logic']}" if 'calculation_logic' in kpi_info else ""}
 
-            ### CONTEXT:
+            ### CONTEXT (MARKDOWN TABLES & TEXT):
             {context_text}
             """
 
