@@ -1,12 +1,8 @@
 import json
 from pathlib import Path
-from io import BytesIO
 from docling.document_converter import DocumentConverter, InputFormat, PdfFormatOption
 from docling.datamodel.pipeline_options import(
     PdfPipelineOptions, TableStructureOptions, TableFormerMode, granite_picture_description)
-import gc #garbage collection
-from pypdf import PdfReader, PdfWriter #splitting pdf for better memory usage
-from docling.datamodel.document import DoclingDocument
 
 """ import logging
 import traceback
@@ -15,8 +11,6 @@ logger = logging.getLogger("docling") """
 
 #This script looks for sustainability reports in data/raw , converts with Docling into a JSON format to be later converted into DoclingDocument, and then pasts the results into data/output.
 #1.Path definition, 2.Iterate reports and convert with Docling (skip if target JSON/Markdown already exists)
-
-BATCH_SIZE = 10
 
 def main():
     #(1)
@@ -38,7 +32,7 @@ def main():
     pipeline_options.picture_description_options.prompt = (
     "Describe the image as clearly as possible. In the process of doing so, name every KPI that is mentioned in the picture and all necessary information to classify that KPI. Be accurate."
     )
-    pipeline_options.images_scale = 0.3
+    pipeline_options.images_scale = 1.0
     pipeline_options.generate_picture_images = False
 
     #For scanned reports:
