@@ -57,7 +57,10 @@ def main():
             processed_chunks = []
             
             for i, chunk in enumerate(chunk_iter):
-                text_for_llm = chunker.contextualize(chunk)
+                #Inlcude heading path into text for llm
+                headings = chunk.meta.export_json_dict().get("headings", [])
+                heading_path = " > ".join(headings)
+                text_for_llm = f"CONTEXT PATH: {heading_path}\n{chunker.contextualize(chunk)}"
 
                 page_set = {prov.page_no for item in chunk.meta.doc_items for prov in item.prov if hasattr(prov, "page_no")}
 
