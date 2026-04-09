@@ -1,0 +1,32 @@
+{
+  "kpi_1": {
+    "value": 31.3,
+    "unit": "%",
+    "page_reference": 124,
+    "quote": "We succeeded in further increasing the proportion of alternative fuels 11) to 31.3 % (previous year: 29.9), while at the same time reducing the specific heat consumption of our kilns. - The key figure corresponds to the definitions of the GCCA, but refers only to the thermal energy required for kiln operations."
+  },
+  "kpi_2": {
+    "value": 14.5,
+    "unit": "%",
+    "page_reference": 124,
+    "quote": "The share of biomass as a fuel increased to 14.5 % (previous year: 13.2 %)."
+  },
+  "kpi_3": {
+    "value": 3909.0,
+    "unit": "MJ/tonne",
+    "page_reference": 128,
+    "quote": "- thereof clinker production, 2024 = 3,909. - thereof clinker production, Unit = MJ/t."
+  },
+  "kpi_4": {
+    "value": 8.9,
+    "unit": "%",
+    "page_reference": 158,
+    "quote": "In 2024, the share was 8.9 %."
+  },
+  "kpi_5": {
+    "value": 69.0,
+    "unit": "%",
+    "page_reference": 48,
+    "quote": "Clinker ratio - the proportion of clinker in cement - was around 69 % in the 2024 financial year (previous year: 70)."
+  }
+}
