@@ -1,32 +1,32 @@
 {
   "kpi_1": {
-    "value": null,
+    "value": 90.3,
     "unit": "%",
-    "page_reference": null,
-    "quote": "Alternative fuel mix in clinker production based on the fuel energy consumption in 2021 as a percentage."
+    "page_reference": 8,
+    "quote": "Proportion of alternative fuels, 2021 = 90.3%"
   },
   "kpi_2": {
-    "value": 35.1,
-    "unit": "%",
+    "value": null,
+    "unit": null,
     "page_reference": null,
-    "quote": "Proportion of biomass, 1 = 35.1%."
+    "quote": null
   },
   "kpi_3": {
     "value": null,
-    "unit": "mg/m\u00b3",
-    "page_reference": "SCHWENK Building Materials Group",
-    "quote": "Limit value ammonia (NH\u2083) emissions in mg/m\u00b3"
+    "unit": null,
+    "page_reference": null,
+    "quote": null
   },
   "kpi_4": {
     "value": null,
     "unit": "%",
     "page_reference": null,
-    "quote": "MORE THAN 10% of natural raw materials for cement manufacture have already been replaced at SCHWENK by alternative substitute materials."
+    "quote": null
   },
   "kpi_5": {
-    "value": 88.6,
+    "value": 79.6,
     "unit": "%",
-    "page_reference": null,
-    "quote": "Clinker/cement factor, 1 = 89.6%. Clinker/cement factor, 2 = 88.6%. Clinker/cement factor, 3 = 87.0%."
+    "page_reference": 8,
+    "quote": "Clinker/cement factor, 2019 = 79.7%. Clinker/cement factor, 2020 = 78.7%. Clinker/cement factor, 2021 = 79.6 %."
   }
 }
