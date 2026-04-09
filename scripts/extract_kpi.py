@@ -6,9 +6,11 @@ from chromadb.utils.embedding_functions import OllamaEmbeddingFunction
 import ollama
 from pydantic import BaseModel
 
+from sentence_transformers import CrossEncoder
+
 #Define the schema for the response
 class KpiBasic(BaseModel):
-    value: str | float | None = None
+    value: float | None = None
     unit: str
     page_reference: int
     quote: str
@@ -21,8 +23,9 @@ RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 EMBED_MODEL_ID = "qwen3-embedding:8b"
 LLM_MODEL = "qwen2.5:14b"
-BATCH_SIZE = 5
-N_RESULTS = 10
+BATCH_SIZE = 5 #for embedding
+N_RESULTS = 40 #for reranking
+FINAL_N_RESULTS = 5
 
 def call_ollama_extraction(prompt):
     """
@@ -42,6 +45,10 @@ def call_ollama_extraction(prompt):
     
 
 def main():
+    #Initialize reranker model
+    reranker = CrossEncoder('cross-encoder/ms-marco-MiniLM-L6-v2')
+
+
     #Since the vector database is PDF specific, vector storage is ephemeral (in-memory vector database)
 
     #fix this:
@@ -104,13 +111,28 @@ def main():
         for kpi_key, kpi_info in metadata["KPIs"].items():
             print(f"Extracting {kpi_info["name"]}")
 
+            #Broad retrieval pre reranker
             query_results=collection.query(
                 query_texts=[kpi_info["search_string"]],
                 n_results=N_RESULTS
             )
 
+            #reranker logic
+            candidates = query_results["documents"][0]
+            metadatas = query_results["metadatas"][0]
+            
+            #Pairs for reranker: [(query, chunk1), (query, chunk2), ...]
+            pairs = [[kpi_info["search_string"], doc] for doc in candidates]
+            scores = reranker.predict(pairs)
+            
+            # Sort by score descending and take top K
+            ranked_indices = scores.argsort()[::-1][:FINAL_N_RESULTS]
+            
+            reranked_docs = [candidates[i] for i in ranked_indices]
+            reranked_metas = [metadatas[i] for i in ranked_indices]
+
             context_segments = []
-            for doc, meta in zip(query_results["documents"][0], query_results["metadatas"][0]):
+            for doc, meta in zip(reranked_docs, reranked_metas):
                 context_segments.append(f"--- SOURCE: Page {meta.get('page_numbers')} ---\n{doc}")
             context_text = "\n\n".join(context_segments)
 
