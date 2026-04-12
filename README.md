@@ -10,7 +10,7 @@ The core processing steps are located in the `scripts/` directory:
 
 * **`parse_reports.py`**: Uses docling to parse PDF reports into structured data.
 * **`chunking_reports.py`**: Handles the segmentation of parsed reports.
-* **KPI Extraction**: A local LLM extracts data points based on the definitions in **`configs/kpi_metadata.json`**.
+* **`extract_kpi.py`**: A local LLM extracts data points based on the definitions in **`configs/kpi_metadata.json`**.
 
 ## Data and Results
 Preliminary extraction results are available in **`data/*_extracted.json`**. Current test cases include:
