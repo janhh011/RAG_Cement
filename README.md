@@ -1,6 +1,6 @@
 # RAG for Cement Industry KPI Extraction
 
-This project is part of my master’s thesis at Technical University Berlin and University College London. It implements a Retrieval-Augmented Generation (RAG) system to automate the extraction of Key Performance Indicators (KPIs) from cement industry sustainability reports.
+This project implements a Retrieval-Augmented Generation (RAG) system to automate the extraction of Key Performance Indicators (KPIs) from cement industry sustainability reports.
 
 ## System Architecture
 The system uses **local components only** (local embeddings and LLMs) to ensure development remains cost-effective and flexible during the research phase. Depending on final accuracy results, the local models may be swapped for cloud-based API models in future iterations.
